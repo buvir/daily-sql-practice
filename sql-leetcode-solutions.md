@@ -68,4 +68,81 @@ ORDER BY
     count_no_trans DESC;
 ````
 
+#### **197. Rising Temperature**
+```markdown
+SELECT
+    w1.id
+FROM
+    Weather w1
+JOIN
+    Weather w2 ON w1.recordDate = w2.recordDate + INTERVAL '1 day'
+WHERE
+    w1.temperature > w2.temperature;
+````
 
+
+#### **1661. Average Time of Process per Machine**
+```markdown
+WITH ProcessTimes AS (
+    SELECT
+        machine_id,
+        process_id,
+        MAX(CASE WHEN activity_type = 'end' THEN timestamp END) - MIN(CASE WHEN activity_type = 'start' THEN timestamp END) AS process_duration
+    FROM
+        Activity
+    GROUP BY
+        machine_id,
+        process_id
+)
+SELECT
+    machine_id,
+    ROUND(AVG(process_duration)::numeric, 3) AS processing_time
+FROM
+    ProcessTimes
+GROUP BY
+    machine_id;
+````
+
+#### **577. Employee Bonus**
+```markdown
+Select e.name,b.bonus from Employee e
+Left  join Bonus b
+on e.empId =b.empId 
+where bonus < 1000 or bonus is null
+````
+
+#### **1280. Students and Examinations**
+```markdown
+SELECT
+    s.student_id,
+    s.student_name,
+    sub.subject_name,
+    COUNT(e.subject_name) AS attended_exams
+FROM
+    Students s
+CROSS JOIN
+    Subjects sub
+LEFT JOIN
+    Examinations e ON s.student_id = e.student_id AND sub.subject_name = e.subject_name
+GROUP BY
+    s.student_id,
+    s.student_name,
+    sub.subject_name
+ORDER BY
+    s.student_id,
+    sub.subject_name;
+````
+
+
+
+#### **570. Managers with at Least 5 Direct Reports**
+```markdown
+Select e1.name from Employee e1
+JOIN
+    Employee e2
+     ON e1.id  = e2.managerId 
+GROUP BY
+    e1.id, e1.name
+HAVING
+    COUNT(e2.id) >= 5;
+````
