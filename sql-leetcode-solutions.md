@@ -1,6 +1,8 @@
 # SQL 50 - LeetCode  
 Solutions for SQL 50 Study Plan on LeetCode  
 
+# ****Select****
+
 #### **URL**
 ```markdown
 https://leetcode.com/studyplan/top-sql-50/
@@ -40,6 +42,8 @@ SELECT tweet_id
 FROM Tweets
 WHERE LENGTH(content) > 15;
 ````
+# ****Basic Joins****
+
 
 #### **1378. Replace Employee ID With The Unique Identifier**
 ```markdown
@@ -134,7 +138,6 @@ ORDER BY
 ````
 
 
-
 #### **570. Managers with at Least 5 Direct Reports**
 ```markdown
 Select e1.name from Employee e1
@@ -145,4 +148,131 @@ GROUP BY
     e1.id, e1.name
 HAVING
     COUNT(e2.id) >= 5;
+````
+
+#### **1934. Confirmation Rate**
+```markdown
+WITH ConfirmationCounts AS (
+    SELECT
+        user_id,
+        SUM(CASE WHEN action = 'confirmed' THEN 1 ELSE 0 END) AS confirmed_count,
+        COUNT(*) AS total_count
+    FROM
+        Confirmations
+    GROUP BY
+        user_id
+)
+SELECT
+    s.user_id,
+    COALESCE(ROUND(CAST(cc.confirmed_count AS DECIMAL) / cc.total_count, 2), 0.00) AS confirmation_rate
+FROM
+    Signups s
+LEFT JOIN
+    ConfirmationCounts cc ON s.user_id = cc.user_id;
+````
+
+# ****Basic Aggregate Functions****
+
+#### **620. Not Boring Movies**
+```markdown
+Select id,movie,description ,rating  from Cinema 
+where id % 2 != 0 AND  description !='boring'
+order by rating desc
+````
+
+#### **1251. Average Selling Price**
+```markdown
+WITH ProductSales AS (
+    SELECT
+        p.product_id,
+        p.price,
+        u.units,
+        u.purchase_date
+    FROM
+        Prices p
+    JOIN
+        UnitsSold u ON p.product_id = u.product_id
+    WHERE u.purchase_date BETWEEN p.start_date AND p.end_date
+),
+ProductRevenue AS (
+    SELECT
+        product_id,
+        SUM(price * units) AS total_revenue,
+        SUM(units) AS total_units_sold
+    FROM
+        ProductSales
+    GROUP BY
+        product_id
+)
+SELECT
+    p.product_id,
+    COALESCE(ROUND(CAST(pr.total_revenue AS DECIMAL) / pr.total_units_sold, 2), 0.00) AS average_price
+FROM
+    Prices p
+LEFT JOIN
+    ProductRevenue pr ON p.product_id = pr.product_id
+GROUP BY p.product_id, pr.total_revenue, pr.total_units_sold
+ORDER BY
+    p.product_id;
+````
+
+
+#### **1075. Project Employees I**
+```markdown
+SELECT
+    p.project_id,
+    ROUND(AVG(e.experience_years), 2) AS average_years
+FROM
+    Project p
+JOIN
+    Employee e ON p.employee_id = e.employee_id
+GROUP BY
+    p.project_id;
+````
+
+
+#### **1633. Percentage of Users Attended a Contest**
+```markdown
+WITH ContestUserCounts AS (
+    SELECT
+        r.contest_id,
+        COUNT(DISTINCT r.user_id) AS num_registered_users
+    FROM
+        Register r
+    GROUP BY
+        r.contest_id
+),
+TotalUserCount AS (
+    SELECT
+        COUNT(user_id) AS total_users
+    FROM
+        Users
+)
+SELECT
+    c.contest_id,
+    ROUND(
+        (CAST(c.num_registered_users AS DECIMAL) / t.total_users) * 100,
+        2
+    ) AS percentage
+FROM
+    ContestUserCounts c,
+    TotalUserCount t
+ORDER BY
+    percentage DESC,
+    c.contest_id ASC;
+
+````
+
+
+#### **1075. Project Employees I**
+```markdown
+SELECT
+    p.project_id,
+    ROUND(AVG(e.experience_years), 2) AS average_years
+FROM
+    Project p
+JOIN
+    Employee e ON p.employee_id = e.employee_id
+GROUP BY
+    p.project_id;
 ````
