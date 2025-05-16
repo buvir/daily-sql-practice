@@ -324,3 +324,32 @@ WHERE (customer_id, order_date) IN (
 );
 
 ```
+#### **550. Game Play Analysis IV**
+```
+WITH FirstLogin AS (
+    SELECT
+        player_id,
+        MIN(event_date) AS first_login_date
+    FROM Activity
+    GROUP BY player_id
+),
+NextDayLogin AS (
+    SELECT
+        a.player_id
+    FROM Activity a
+    JOIN FirstLogin f
+        ON a.player_id = f.player_id
+       AND a.event_date = f.first_login_date + INTERVAL '1 day'
+),
+TotalPlayers AS (
+    SELECT COUNT(DISTINCT player_id) AS total FROM Activity
+),
+ReturningPlayers AS (
+    SELECT COUNT(DISTINCT player_id) AS returning FROM NextDayLogin
+)
+SELECT 
+    ROUND(r.returning::DECIMAL / t.total, 2) AS fraction
+FROM ReturningPlayers r, TotalPlayers t;
+
+
+```
